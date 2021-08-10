@@ -72,7 +72,7 @@ const postCreate = async (parent, args, { req }) => {
 };
 
 const postUpdate = async (_, args, { req }) => {
-    const post = await Post.findByIdAndUpdate(args.input._id, {
+    const post = await Post.findByIdAndUpdate(args.input.id, {
         ...args.input
     }, {new: true});
 
@@ -80,10 +80,8 @@ const postUpdate = async (_, args, { req }) => {
 }
 
 const postDelete = async (_, args, { req }) => {
-    const { _id, ...rest } = args.input;
-    const post = await Post.findByIdAndDelete(_id, {
-        ...rest
-    }, {new: true});
+    const { id } = args;
+    const post = await Post.findByIdAndDelete(id);
 
     return post;
 }

@@ -5,6 +5,7 @@ import FileUpload from '../../components/FileUpload';
 import { POST_CREATE } from '../../graphql/mutations';
 import { POSTS_BY_USER } from '../../graphql/queries';
 import PostCard from '../../components/PostCard';
+import { Link } from 'react-router-dom';
 
 const initialState = {
     content: "",
@@ -20,7 +21,6 @@ const Post = () => {
 
     // query
     const { data: posts } = useQuery(POSTS_BY_USER);
-
     // destruct
     const { content } = values;
 
@@ -100,8 +100,13 @@ const Post = () => {
             <hr />
             <div className="row p-5">
                 { posts &&
-                    posts.map((post) => (
-                        <PostCard post={post} />
+                    posts.postsByUser.map((post) => (
+                        <div className="col-md-6 pt-5" key={post._id}>
+                            <PostCard post={post} />
+                            <Link to={`/post/${post._id}`}>
+                                <p className="text-primary text-center">Edit</p>
+                            </Link>
+                        </div>
                     ))
                 }
             </div>

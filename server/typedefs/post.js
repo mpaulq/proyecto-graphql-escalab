@@ -18,14 +18,14 @@ module.exports = gql`
     }
     # input type
     input PostUpdateInput {
-        _id: ID!
+        id: ID!
         content: String
         image: ImageInput
     }
     type Query {
         allPosts: [Post!]!
         postsByUser: [Post!]!
-        postById(id: ID): [Post!]!
+        postById(id: ID): Post!
         postsByPage(page: Int): PageInfo!
         postsSearch(content: String): [Post!]!
     }
@@ -33,6 +33,6 @@ module.exports = gql`
     type Mutation {
         postCreate(input: PostCreateInput!): Post!
         postUpdate(input: PostUpdateInput!): Post!
-        postDelete(id: ID): Boolean
+        postDelete(id: ID!): Post!
     }
 `;

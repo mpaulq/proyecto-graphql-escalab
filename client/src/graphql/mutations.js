@@ -34,11 +34,12 @@ export const POST_UPDATE = gql`
       ...postData
     }
   }
+  ${POST_DATA}
 `;
 
 export const POST_DELETE = gql`
-  mutation postDelete($input: ID!) {
-    postDelete(input: $input) {
+  mutation postDelete($id: ID!) {
+    postDelete(id: $id) {
       _id
     }
   }

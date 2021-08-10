@@ -20,7 +20,7 @@ export const PROFILE = gql`
 `;
 
 export const PUBLIC_PROFILE = gql`
-    query publicProfile($username: String) {
+    query publicProfile($username: String!) {
         publicProfile(username: $username) {
             _id
             username
@@ -46,7 +46,7 @@ export const GET_ALL_POSTS = gql`
 
 export const POSTS_BY_USER = gql`
     query {
-        postByUser {
+        postsByUser {
             ...postData
         }
     }
@@ -54,8 +54,8 @@ export const POSTS_BY_USER = gql`
 `;
 
 export const POST_BY_ID = gql`
-    query {
-        postById {
+    query postById ($id: ID!) {
+        postById (id: $id) {
             ...postData
         }
     }
