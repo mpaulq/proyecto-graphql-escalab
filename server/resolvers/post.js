@@ -23,17 +23,21 @@ const postsByUser = async (parent, args, { req }) => {
 };
 
 const postById = async (_, args, { req }) => {
-    return await Post.findById(args.id).exec();
+    return await Post.findById(args.id)
+        .populate("postedBy", "_id username")
+        .exec();
 };
 
 const postsByPage = async (_, args, { req }) => {
-    // default 10 elements per page
-    const limit = 10;
-    const page = args.page;
+    // default 9 elements per page
+    const limit = 9;
+    const page = args.page - 1;
     const totalPosts = await Post.countDocuments();
 
     const filteredPosts = await Post
-        .find({}, {skip: limit*page, limit: limit})
+        .find({})
+        .limit(limit)
+        .skip(limit*page)
         .populate("postedBy", "_id username")
         .exec();
     
@@ -44,9 +48,16 @@ const postsByPage = async (_, args, { req }) => {
 }
 
 const postsSearch = async (_, args, { req }) => {
+    if (!args.content) {
+        return await Post.find({})
+        .populate("postedBy", "_id username")
+        .sort({ createdAt: -1 })
+        .exec();
+    }
     return await Post
         .find({content: {$regex: args.content, $options: "i"}})
         .populate("postedBy", "_id username")
+        .sort({ createdAt: -1 })
         .exec()
 }
 // const totalPosts = () => posts.length;
@@ -74,7 +85,9 @@ const postCreate = async (parent, args, { req }) => {
 const postUpdate = async (_, args, { req }) => {
     const post = await Post.findByIdAndUpdate(args.input.id, {
         ...args.input
-    }, {new: true});
+    }, {new: true})
+        .populate("postedBy", "_id username")
+        .exec();
 
     return post;
 }
@@ -103,6 +116,7 @@ module.exports = {
         allPosts,
         postsByUser,
         postById,
+        postsSearch,
         postsByPage,
     },
     Mutation: {

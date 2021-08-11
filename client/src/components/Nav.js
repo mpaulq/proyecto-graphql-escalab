@@ -1,10 +1,13 @@
-import React, { useContext, Fragment } from "react";
+import React, { useState, useContext, Fragment } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { auth } from "firebase";
 import { AuthContext } from "../context/authContext";
+import { NavContext } from "../context/navContext";
 
 const Nav = () => {
   const { state, dispatch } = useContext(AuthContext);
+  const { setSearch } = useContext(NavContext);
+  const [field, setField] = useState("")
   let history = useHistory();
 
   const { user } = state;
@@ -16,6 +19,17 @@ const Nav = () => {
       payload: null,
     });
     history.push("/login");
+  };
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    setField({ ...field,  [e.target.name]: e.target.value })
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSearch({ searchField: field.search });
+    history.push("/post/search")
   };
 
   return (
@@ -72,9 +86,11 @@ const Nav = () => {
             </li>
           )}
         </ul>
-        <form className="form-inline my-2 my-lg-0">
+        <form className="form-inline my-2 my-lg-0" onSubmit={handleSubmit}>
           <input
             className="form-control mr-sm-2"
+            onChange={handleChange}
+            name="search"
             type="search"
             placeholder="Search"
             aria-label="Search"

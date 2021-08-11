@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react'
 import { toast } from 'react-toastify';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { POST_BY_ID } from '../../graphql/queries';
-import { POST_DELETE, POST_UPDATE } from '../../graphql/mutations';
-import PostCard from '../../components/PostCard';
+import { POST_UPDATE } from '../../graphql/mutations';
 import FileUpload from '../../components/FileUpload';
 
 const Posts = () => {
@@ -14,19 +13,20 @@ const Posts = () => {
         image: {
             url: "",
             public_id: ""
+        },
+        postedBy: {
+            username: ""
         }
     });
     const [loading, setLoading] = useState(false);
     
     let params = useParams();
-    let history = useHistory();
     const { data } = useQuery(POST_BY_ID, {
         variables: { id: params.id }
     });
 
     useMemo(() => {
         if (data) {
-            console.log(data.postById);
             setValues({
                 ...values,
                 id: data.postById._id,
@@ -34,6 +34,9 @@ const Posts = () => {
                 image: {
                     url: data.postById.image.url,
                     public_id: data.postById.image.public_id
+                },
+                postedBy: {
+                    username: data.postById.username
                 }
             });
         }
@@ -44,34 +47,25 @@ const Posts = () => {
 
     // mutation
     const [postUpdate] = useMutation(POST_UPDATE, {
-        update: ({ values }) => {
+        update: ({ data }) => {
             toast.success("Post updated");
-        }
-    });
-    const [postDelete] = useMutation(POST_DELETE, {
-        update: ({ values }) => {
-            toast.success("Post deleted");
         }
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
-        postUpdate({ variables: { input: values }});
+        postUpdate({ variables: { input: {
+            id: values.id,
+            content: values.content,
+            image: values.image
+        } }});
         setLoading(false);
     };
 
     const handleChange = (e) => {
         setValues({ ...values, [e.target.name]: e.target.value });
     };
-
-    const handleDelete = (e) => {
-        e.preventDefault();
-        setLoading(true);
-        postDelete({ variables: { id: params.id } });
-        setLoading(false);
-        history.push('/profile');
-    }
 
     const createForm = () => (
         <form onSubmit={handleSubmit}> 
@@ -90,9 +84,6 @@ const Posts = () => {
 
             <button className="btn btn-primary" type="submit" disabled={loading || !content.length}>
                 Edit
-            </button>
-            <button className="btn btn-danger float-right" onClick={handleDelete} disabled={loading || !content.length}>
-                Delete
             </button>
         </form>
     );

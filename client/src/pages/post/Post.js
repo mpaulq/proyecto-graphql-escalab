@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import FileUpload from '../../components/FileUpload';
-import { POST_CREATE } from '../../graphql/mutations';
+import { POST_CREATE, POST_DELETE } from '../../graphql/mutations';
 import { POSTS_BY_USER } from '../../graphql/queries';
 import PostCard from '../../components/PostCard';
 import { Link } from 'react-router-dom';
@@ -29,16 +29,31 @@ const Post = () => {
         // read query from cache / write query to cache
         update: (cache, { data: { postCreate }}) => {
             // read query from cache
-            const { postByUser } = cache.readQuery({
+            const { postsByUser } = cache.readQuery({
                 query: POSTS_BY_USER
             });
             // write query to cache
             cache.writeQuery({
                 query: POSTS_BY_USER,
                 data: {
-                    postByUser: [postCreate, ...postByUser]
+                    postsByUser: [postCreate, ...postsByUser]
                 }
             });
+        },
+            onError: (err) => console.log(err.graphQLError[0].message)
+    });
+    const [ postDelete ] = useMutation(POST_DELETE, {
+        update: (cache, { data: { postDelete } }) => {
+            const { postsByUser } = cache.readQuery({
+                query: POSTS_BY_USER
+            });
+            cache.writeQuery({
+                query: POSTS_BY_USER,
+                data: {
+                    postsByUser: postsByUser.filter(post => post._id !== postDelete._id)
+                }
+            })
+            toast.success("Post deleted")
         },
             onError: (err) => console.log(err.graphQLError[0].message)
     });
@@ -51,6 +66,15 @@ const Post = () => {
         setLoading(false);
         toast.success("Post created");
     };
+
+    const handleDelete = (id) => {
+        return event => {
+            event.preventDefault();
+            setLoading(true);
+            postDelete({variables: { id: id }})
+            setLoading(false);
+        }
+    }
 
     const handleChange = (e) => {
         e.preventDefault();
@@ -103,9 +127,18 @@ const Post = () => {
                     posts.postsByUser.map((post) => (
                         <div className="col-md-6 pt-5" key={post._id}>
                             <PostCard post={post} />
-                            <Link to={`/post/${post._id}`}>
-                                <p className="text-primary text-center">Edit</p>
-                            </Link>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <Link to={`/post/${post._id}`}>
+                                        <p className="text-primary text-center">Edit</p>
+                                    </Link>
+                                </div>
+                                <div className="col-md-6">
+                                    <a onClick={handleDelete(post._id)}>
+                                        <p className="text-danger text-center">Delete</p>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     ))
                 }

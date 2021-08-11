@@ -27,12 +27,12 @@ module.exports = gql`
         postsByUser: [Post!]!
         postById(id: ID): Post!
         postsByPage(page: Int): PageInfo!
-        postsSearch(content: String): [Post!]!
+        postsSearch(content: String): [Post!]
     }
     # mutations
     type Mutation {
         postCreate(input: PostCreateInput!): Post!
         postUpdate(input: PostUpdateInput!): Post!
-        postDelete(id: ID!): Post!
+        postDelete(id: ID!): Post
     }
 `;
