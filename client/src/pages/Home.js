@@ -6,9 +6,10 @@ import PostCard from '../components/PostCard';
 
 
 const Home = () => {
+    const limit = 9;
     const [page, setPage] = useState(1);
     const { data, loading } = useQuery(POST_PAGINATION, {
-        variables: { page }
+        variables: { input: {page, limit} }
     }, [page]);
 
     const handlePrev = (e) => {
@@ -23,7 +24,7 @@ const Home = () => {
 
     const pagination = () => {
         const isPrevious = page > 1;
-        const isNext = page*9 < data.postsByPage.totalCount;
+        const isNext = page*limit < data.postsByPage.totalCount;
         return (
             <ul className="pagination" style={{justifyContent: 'center'}}>
                 { isPrevious && <li className="page-item"><a className="page-link text-primary" onClick={handlePrev} >Previous</a></li> }

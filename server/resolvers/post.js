@@ -29,9 +29,8 @@ const postById = async (_, args, { req }) => {
 };
 
 const postsByPage = async (_, args, { req }) => {
-    // default 9 elements per page
-    const limit = 9;
-    const page = args.page - 1;
+    const limit = args.input.limit;
+    const page = args.input.page - 1;
     const totalPosts = await Post.countDocuments();
 
     const filteredPosts = await Post
@@ -42,8 +41,10 @@ const postsByPage = async (_, args, { req }) => {
         .exec();
     
     return {
+        page: page + 1,
+        limit: limit,
+        totalCount: totalPosts,
         posts: filteredPosts,
-        totalCount: totalPosts
     }
 }
 

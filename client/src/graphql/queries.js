@@ -63,8 +63,8 @@ export const POST_BY_ID = gql`
 `;
 
 export const POST_PAGINATION = gql`
-    query postsByPage($page: Int) {
-        postsByPage(page: $page) {
+    query postsByPage($input: PostPaginateInput) {
+        postsByPage(input: $input) {
             posts {
                 ...postData
             }

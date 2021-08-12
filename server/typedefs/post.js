@@ -8,8 +8,10 @@ module.exports = gql`
         postedBy: User
     }
     type PageInfo {
-        posts: [Post!]!
+        page: Int!
+        limit: Int!
         totalCount: Int!
+        posts: [Post!]!
     }
     # input type
     input PostCreateInput {
@@ -22,11 +24,16 @@ module.exports = gql`
         content: String
         image: ImageInput
     }
+    # input type
+    input PostPaginateInput {
+        page: Int!
+        limit: Int!
+    }
     type Query {
         allPosts: [Post!]!
         postsByUser: [Post!]!
         postById(id: ID): Post!
-        postsByPage(page: Int): PageInfo!
+        postsByPage(input: PostPaginateInput): PageInfo!
         postsSearch(content: String): [Post!]
     }
     # mutations
