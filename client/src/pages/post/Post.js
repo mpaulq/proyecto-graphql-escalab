@@ -18,6 +18,7 @@ const initialState = {
 const Post = () => {
     const [values, setValues] = useState(initialState);
     const [loading, setLoading] = useState(false);
+    const [post, setPost] = useState(null);
 
     // query
     const { data: posts } = useQuery(POSTS_BY_USER);
@@ -102,6 +103,41 @@ const Post = () => {
         </form>
     );
 
+    const modalPostDelete = () => (
+        <div 
+            className="modal fade"
+            id="modalPostDelete"
+            tabIndex="-1"
+            aria-labelledby="modalPostDeleteLabel"
+            aria-hidden="true">
+            <div className="modal-dialog">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="modalPostDeleteLabel">Delete Post</h5>
+                    </div>
+                    <div className="modal-body">
+                        Are you sure you want to delete this post?
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secundary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" className="btn btn-danger" onClick={handleDelete(post)}>Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    const toggleModal = (id) => {
+        return event => {
+            event.preventDefault();
+            const modalButton = document.getElementById("toggleModalButton");
+            modalButton.click();
+            setPost(id)
+        }
+    };
+
     return (
         <div className="container p-5">
             { loading ? (
@@ -109,6 +145,18 @@ const Post = () => {
             ) : (
                 <h4>Create</h4>
             )}
+
+            <button
+                id="toggleModalButton"
+                type="button"
+                className="btn btn-primary"
+                data-toggle="modal"
+                data-target="#modalPostDelete"
+                hidden={true}
+            >
+            </button>
+
+            { modalPostDelete() }
 
             <FileUpload
                 values={values}
@@ -134,7 +182,7 @@ const Post = () => {
                                     </Link>
                                 </div>
                                 <div className="col-md-6">
-                                    <a onClick={handleDelete(post._id)}>
+                                    <a onClick={toggleModal(post._id)}>
                                         <p className="text-danger text-center">Delete</p>
                                     </a>
                                 </div>
